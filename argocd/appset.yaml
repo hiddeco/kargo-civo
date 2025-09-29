@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: guestbook-civo
+  namespace: argocd
+spec:
+  generators:
+  - git:
+      repoURL: https://github.com/hiddeco/kargo-civo.git
+      revision: HEAD
+      directories:
+      - path: env/*
+  template:
+    metadata:
+      name: guestbook-civo-{{path.basename}}
+      annotations:
+        kargo.akuity.io/authorized-stage: kargo-civo:{{path.basename}}
+    spec:
+      destination:
+        namespace: guestbook-civo-{{path.basename}}
+        # Specify either a cluster destination name or server address:
+        # name: REPLACEME
+        server: https://kubernetes.default.svc
+      project: guestbook-civo
+      source:
+        path: ./
+        repoURL: https://github.com/hiddeco/kargo-civo.git
+        targetRevision: env/{{path.basename}}
