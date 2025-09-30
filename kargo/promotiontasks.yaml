@@ -64,7 +64,7 @@ spec:
     if: ${{ vars.openpr == 'true' }}
     as: push
     config:
-      path: ./src
+      path: ./out
       generateTargetBranch: true
   # Open a pull request to merge the changes into the main branch.
   - uses: git-open-pr
@@ -74,14 +74,14 @@ spec:
       repoURL: ${{ vars.repoURL }}
       createTargetBranch: true
       sourceBranch: ${{ task.outputs.push.branch }}
-      targetBranch: ${{ vars.branch }}
+      targetBranch: env/${{ ctx.stage }}
   # Wait for the pull request to be merged.
   - uses: git-wait-for-pr
     as: wait-for-pr
     if: ${{ vars.openpr == 'true' }}
     config:
       repoURL: ${{ vars.repoURL }}
-      prNumber: ${{ task.outputs['open-pr'].pr.number }}
+      prNumber: ${{ task.outputs['open-pr'].pr.id }}
   # Request a sync of the ArgoCD Application to apply the changes from the
   # commit.
   - uses: argocd-update
